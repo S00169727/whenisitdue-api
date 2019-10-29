@@ -31,9 +31,9 @@ app.use(
 );
 app.use(morgan('dev'));
 
-// app.use('/', require('../routes/users'));
-// app.use('/', require('../routes/skills'));
-// app.use('/', require('../routes/activities'));
+app.use('/api/user', require('../routes/user'));
+app.use('/api/team', require('../routes/team'));
+app.use('/api/post', require('../routes/post'));
 
 /**
  * Error handling
@@ -55,7 +55,7 @@ app.use((error, req, res) => {
  */
 console.log(chalk.blue('Establishing Database Connection...'));
 mongoose
-  .connect(process.env.MongoURI,
+  .connect(process.env.MONGODB_URI,
     { useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true })
   .then(() => {
     app.listen(PORT, console.log(chalk.yellow(`✔︎ Server started on port ${PORT}`)));
@@ -70,7 +70,7 @@ mongoose
  */
 const { connection } = mongoose;
 connection.on('connected', () => {
-  console.log(chalk.green(`✔︎ Connected to Database: ${process.env.MongoURI}`));
+  console.log(chalk.green(`✔︎ Connected to Database: ${process.env.MONGODB_URI}`));
 });
 connection.on('error', (err) => {
   console.log(chalk.red(`✘ Database Error: ${err}`));
