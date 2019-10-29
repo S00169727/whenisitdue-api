@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 
 const TeamSchema = new mongoose.Schema({
-  _id: mongoose.Schema.Types.ObjectId,
   name: {
     type: String,
     required: true,
@@ -12,6 +11,10 @@ const TeamSchema = new mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now,
+  },
+  owner: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
   },
   posts: [{
     type: mongoose.Schema.Types.ObjectId,
