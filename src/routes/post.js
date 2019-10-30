@@ -4,15 +4,15 @@ const mongoose = require('mongoose');
 
 const User = require('../models/User');
 const Team = require('../models/Team');
-const Post = require('../models/Team');
+const Post = require('../models/Post');
 const verifyToken = require('../middleware/verifyToken');
 
 const router = express.Router();
 
-router.post('/create', verifyToken, async (req, res, next) => {
+router.post('/create', verifyToken, async (req, res) => {
   try {
     const {
-      title, body, teamId,
+      title, body, teamId, dueDate,
     } = req.body;
 
     const { userId } = req.data;
@@ -22,7 +22,10 @@ router.post('/create', verifyToken, async (req, res, next) => {
       body,
       team: teamId,
       owner: userId,
+      dueDate: new Date(dueDate),
     });
+
+    await post.save();
 
     const user = await User.findById(userId);
 
@@ -37,13 +40,25 @@ router.post('/create', verifyToken, async (req, res, next) => {
     await team.save();
 
     return res.status(200).json({
-      message: 'Team created successfully',
+      message: 'Post created successfully',
       post,
     });
   } catch (error) {
     return res.status(500).json({
       error,
     });
+  }
+});
+
+router.get('/get-posts-by-team', verifyToken, async (req, res) => {
+  try {
+    const { teamId } = req.body;
+
+    const posts = await Post.find({ team: teamId });
+
+    return res.status(200).json({ posts });
+  } catch (error) {
+    return res.status(404).json({ message: 'Something went wrong' });
   }
 });
 
