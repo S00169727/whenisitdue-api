@@ -35,6 +35,10 @@ const UserSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Comment',
   }],
+  favourites: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Team',
+  }],
 });
 
 const User = mongoose.model('User', UserSchema);
