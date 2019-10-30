@@ -43,4 +43,16 @@ router.post('/create', verifyToken, async (req, res, next) => {
   }
 });
 
+router.get('/get-teams', verifyToken, async (req, res) => {
+  try {
+    const { userId } = req.data;
+
+    const teams = await Team.find({ owner: userId }).populate('posts');
+
+    return res.status(200).json({ teams });
+  } catch (error) {
+    return res.status(404).json({ message: 'Something went wrong' });
+  }
+});
+
 module.exports = router;
