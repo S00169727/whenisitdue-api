@@ -50,13 +50,15 @@ router.post('/create', verifyToken, async (req, res) => {
   }
 });
 
-router.get('/get-posts-by-team', verifyToken, async (req, res) => {
+router.post('/get-posts-by-team', verifyToken, async (req, res) => {
   try {
     const { teamId } = req.body;
 
-    const posts = await Post.find({ team: teamId });
+    const posts = await Post.find({ team: teamId }).populate('owner', 'name').populate('members');
 
-    return res.status(200).json({ posts });
+    const team = await Team.findById(teamId).populate('members owner', 'name').select('name description createdAt');
+
+    return res.status(200).json({ posts, team });
   } catch (error) {
     return res.status(404).json({ message: 'Something went wrong' });
   }
