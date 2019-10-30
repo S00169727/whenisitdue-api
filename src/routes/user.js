@@ -34,8 +34,6 @@ router.post('/register', async (req, res, next) => {
 
     return res.status(200).json({
       message: 'Registration successful',
-      // remove newUser in production
-      newUser,
     });
   } catch (error) {
     return res.status(500).json({
@@ -44,7 +42,7 @@ router.post('/register', async (req, res, next) => {
   }
 });
 
-router.post('/login', verifyToken, async (req, res, next) => {
+router.post('/login', async (req, res, next) => {
   User.findOne({ email: req.body.email })
     .select('+password')
     .exec()
