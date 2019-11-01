@@ -15,8 +15,6 @@ router.post('/create', verifyToken, async (req, res) => {
       title, body, teamId, dueDate,
     } = req.body.data;
 
-    console.log(title, body, teamId, dueDate);
-
     const { userId } = req.data;
 
     const post = await Post.create({
