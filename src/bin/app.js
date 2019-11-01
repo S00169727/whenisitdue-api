@@ -34,6 +34,7 @@ app.use(morgan('dev'));
 app.use('/api/user', require('../routes/user'));
 app.use('/api/team', require('../routes/team'));
 app.use('/api/post', require('../routes/post'));
+app.use('/api/invitation', require('../routes/invitation'));
 
 /**
  * Error handling
