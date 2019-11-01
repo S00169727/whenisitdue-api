@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 
 const InvitationSchema = new mongoose.Schema({
-  _id: mongoose.Schema.Types.ObjectId,
   senderId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
