@@ -12,9 +12,9 @@ const router = express.Router();
 router.post('/create', verifyToken, async (req, res) => {
   try {
     const {
-      title, body, teamId, dueDate,
+      title, body, teamId, dueDate, time
     } = req.body.data;
-
+    
     const { userId } = req.data;
 
     const post = await Post.create({
@@ -22,7 +22,7 @@ router.post('/create', verifyToken, async (req, res) => {
       body,
       team: teamId,
       owner: userId,
-      dueDate: new Date(dueDate),
+      dueDate: new Date(dueDate.year, dueDate.month - 1, dueDate.day, time.hour, time.minute, time.second),
     });
 
     await post.save();
