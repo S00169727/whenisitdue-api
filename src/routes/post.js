@@ -13,7 +13,9 @@ router.post('/create', verifyToken, async (req, res) => {
   try {
     const {
       title, body, teamId, dueDate,
-    } = req.body;
+    } = req.body.data;
+
+    console.log(title, body, teamId, dueDate);
 
     const { userId } = req.data;
 
@@ -54,9 +56,13 @@ router.post('/get-posts-by-team', verifyToken, async (req, res) => {
   try {
     const { teamId } = req.body;
 
-    const posts = await Post.find({ team: teamId }).populate('owner', 'name').populate('members');
-
     const team = await Team.findById(teamId).populate('members owner', 'name').select('name description createdAt');
+
+    if (!team.members.filter(el => el._id.equals(req.data.userId)).length > 0) {
+      return res.status(404).json({ message: 'Something went wrong' });
+    }
+
+    const posts = await Post.find({ team: teamId }).populate('owner', 'name').populate('members');
 
     return res.status(200).json({ posts, team });
   } catch (error) {
