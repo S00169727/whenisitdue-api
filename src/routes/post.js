@@ -13,8 +13,8 @@ router.post('/create', verifyToken, async (req, res) => {
   try {
     const {
       title, body, teamId, dueDate, time
-    } = req.body.data;
-    
+    } = req.body;
+
     const { userId } = req.data;
 
     const post = await Post.create({
