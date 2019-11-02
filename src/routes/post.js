@@ -12,7 +12,7 @@ const router = express.Router();
 router.post('/create', verifyToken, async (req, res) => {
   try {
     const {
-      title, body, teamId, dueDate, time
+      title, body, teamId, dueDate, time,
     } = req.body;
 
     const { userId } = req.data;
@@ -53,6 +53,7 @@ router.post('/create', verifyToken, async (req, res) => {
 router.post('/get-posts-by-team', verifyToken, async (req, res) => {
   try {
     const { teamId } = req.body;
+    const { userId } = req.data;
 
     const team = await Team.findById(teamId).populate('members owner', 'name').select('name description createdAt');
 
@@ -62,7 +63,39 @@ router.post('/get-posts-by-team', verifyToken, async (req, res) => {
 
     const posts = await Post.find({ team: teamId }).populate('owner', 'name').populate('members');
 
-    return res.status(200).json({ posts, team });
+    return res.status(200).json({ posts, team, userId });
+  } catch (error) {
+    return res.status(404).json({ message: 'Something went wrong' });
+  }
+});
+
+router.post('/remove', verifyToken, async (req, res) => {
+  try {
+    const { postId } = req.body;
+    const { userId } = req.data;
+
+    const post = await Post.findById(postId);
+
+    if (!post.owner.equals(userId)) {
+      return res.status(404).json({ message: 'Something went wrong' });
+    }
+
+    await post.remove();
+
+    console.log(post.team);
+
+    await Team.findOneAndUpdate(
+      { _id: post.team },
+      { $pull: { posts: new mongoose.Types.ObjectId(post._id) } },
+    );
+
+    await User.findOneAndUpdate(
+      { _id: userId },
+      { $pull: { posts: new mongoose.Types.ObjectId(post._id) } },
+    );
+
+
+    return res.status(200).json({ message: 'Post removed!' });
   } catch (error) {
     return res.status(404).json({ message: 'Something went wrong' });
   }
