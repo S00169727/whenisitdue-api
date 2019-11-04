@@ -58,12 +58,27 @@ router.post('/get-posts-by-team', verifyToken, async (req, res) => {
     const team = await Team.findById(teamId).populate('members owner', 'name').select('name description createdAt');
 
     if (!team.members.filter(el => el._id.equals(req.data.userId)).length > 0) {
-      return res.status(404).json({ message: 'Something went wrong' });
+      const limitedTeam = await Team.findById(teamId).select('name description createdAt');
+      return res.status(200).json({ limitedTeam, isMember: false });
     }
 
     const posts = await Post.find({ team: teamId }).populate('owner', 'name').populate('members');
 
-    return res.status(200).json({ posts, team, userId });
+    return res.status(200).json({
+      posts, team, userId, isMember: true,
+    });
+  } catch (error) {
+    return res.status(404).json({ message: 'Something went wrong' });
+  }
+});
+
+router.get('/get-posts-by-user', verifyToken, async (req, res) => {
+  try {
+    const { userId } = req.data;
+
+    const posts = await Post.find({ owner: userId }).populate('posts').populate('team', 'name');
+
+    return res.status(200).json({ posts, userId });
   } catch (error) {
     return res.status(404).json({ message: 'Something went wrong' });
   }
