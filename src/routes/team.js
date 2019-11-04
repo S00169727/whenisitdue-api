@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 
 const User = require('../models/User');
 const Team = require('../models/Team');
+const Post = require('../models/Post');
 const verifyToken = require('../middleware/verifyToken');
 
 const router = express.Router();
@@ -71,6 +72,32 @@ router.post('/leave', verifyToken, async (req, res) => {
     );
 
     return res.status(200).json({ message: 'Successfully left the team!' });
+  } catch (error) {
+    return res.status(404).json({ message: 'Something went wrong' });
+  }
+});
+
+router.post('/remove', verifyToken, async (req, res) => {
+  try {
+    const { teamId } = req.body;
+    const { userId } = req.data;
+
+    const team = await Team.findById(teamId);
+
+    if (!team.owner.equals(userId)) {
+      return res.status(401).json({ message: 'Something went wrong' });
+    }
+
+    await team.remove();
+
+    await User.findOneAndUpdate(
+      { _id: userId },
+      { $pull: { teams: new mongoose.Types.ObjectId(teamId) } },
+    );
+
+    await Post.deleteMany({ team: teamId });
+
+    return res.status(200).json({ message: 'Successfully removed team' });
   } catch (error) {
     return res.status(404).json({ message: 'Something went wrong' });
   }
