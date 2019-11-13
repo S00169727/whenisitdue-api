@@ -64,7 +64,6 @@ router.post('/login', async (req, res, next) => {
                   messsge: 'Authentication was successful',
                   id: user._id,
                   token,
-                  isAdmin: user.isAdmin,
                 });
               },
             );
