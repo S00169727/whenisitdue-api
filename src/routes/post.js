@@ -55,7 +55,7 @@ router.post('/get-posts-by-team', verifyToken, async (req, res) => {
     const { teamId } = req.body;
     const { userId } = req.data;
 
-    const team = await Team.findById(teamId).populate('members owner', 'name').select('name description createdAt');
+    const team = await Team.findById(teamId).populate('members owner', 'name').select('name description createdAt admins');
 
     if (!team.members.filter(el => el._id.equals(req.data.userId)).length > 0) {
       const limitedTeam = await Team.findById(teamId).select('name description createdAt');
@@ -91,13 +91,13 @@ router.post('/remove', verifyToken, async (req, res) => {
 
     const post = await Post.findById(postId);
 
-    if (!post.owner.equals(userId)) {
+    const team = await Team.findOne({ _id: new mongoose.Types.ObjectId(post.team) });
+
+    if (!team.admins.filter(el => el.equals(new mongoose.Types.ObjectId(userId))).length > 0 && !post.owner.equals(userId)) {
       return res.status(404).json({ message: 'Something went wrong' });
     }
 
     await post.remove();
-
-    console.log(post.team);
 
     await Team.findOneAndUpdate(
       { _id: post.team },
@@ -108,7 +108,6 @@ router.post('/remove', verifyToken, async (req, res) => {
       { _id: userId },
       { $pull: { posts: new mongoose.Types.ObjectId(post._id) } },
     );
-
 
     return res.status(200).json({ message: 'Post removed!' });
   } catch (error) {
