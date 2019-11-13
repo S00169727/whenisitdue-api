@@ -24,6 +24,7 @@ router.post('/create', verifyToken, async (req, res, next) => {
     });
 
     team.members.push(new mongoose.Types.ObjectId(userId));
+    team.admins.push(new mongoose.Types.ObjectId(userId));
 
     await team.save();
 
@@ -50,7 +51,9 @@ router.get('/get-teams', verifyToken, async (req, res) => {
 
     const teams = await Team.find({ members: userId }).populate('posts');
 
-    return res.status(200).json({ teams });
+    const user = await User.findById(userId).select('name');
+
+    return res.status(200).json({ teams, user });
   } catch (error) {
     return res.status(404).json({ message: 'Something went wrong' });
   }
