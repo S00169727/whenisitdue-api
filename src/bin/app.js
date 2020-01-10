@@ -35,6 +35,7 @@ app.use('/api/user', require('../routes/user'));
 app.use('/api/team', require('../routes/team'));
 app.use('/api/post', require('../routes/post'));
 app.use('/api/invitation', require('../routes/invitation'));
+app.use('/api/comment', require('../routes/comment'));
 
 /**
  * Error handling
