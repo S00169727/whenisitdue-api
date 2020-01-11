@@ -11,9 +11,7 @@ const router = express.Router();
 
 router.post('/create', verifyToken, async (req, res, next) => {
   try {
-    const {
-      name, description,
-    } = req.body;
+    const { name, description } = req.body;
 
     const { userId } = req.data;
 
@@ -49,9 +47,11 @@ router.get('/get-teams', verifyToken, async (req, res) => {
   try {
     const { userId } = req.data;
 
-    const teams = await Team.find({ members: userId }).populate('posts');
+    const teams = await Team.find({ members: userId });
 
-    const user = await User.findById(userId).select('name');
+    const user = await User.findById(userId)
+      .select('name')
+      .populate('favourites');
 
     return res.status(200).json({ teams, user });
   } catch (error) {
@@ -101,6 +101,43 @@ router.post('/remove', verifyToken, async (req, res) => {
     await Post.deleteMany({ team: teamId });
 
     return res.status(200).json({ message: 'Successfully removed team' });
+  } catch (error) {
+    return res.status(404).json({ message: 'Something went wrong' });
+  }
+});
+
+router.post('/add-to-favourites', verifyToken, async (req, res) => {
+  try {
+    const { teamId } = req.body;
+
+    const { userId } = req.data;
+
+    const user = await User.findById(userId);
+
+    user.favourites.push(new mongoose.Types.ObjectId(teamId));
+
+    await user.save();
+
+    return res.status(200).json({ message: 'Team added to favourites' });
+  } catch (error) {
+    return res.status(404).json({ message: 'Something went wrong' });
+  }
+});
+
+router.post('/remove-from-favourites', verifyToken, async (req, res) => {
+  try {
+    const { teamId } = req.body;
+
+    const { userId } = req.data;
+
+    await User.findOneAndUpdate(
+      { _id: userId },
+      { $pull: { favourites: new mongoose.Types.ObjectId(teamId) } },
+    );
+
+    const user = await User.findById(userId);
+
+    return res.status(200).json({ message: 'Team removed from favourites' });
   } catch (error) {
     return res.status(404).json({ message: 'Something went wrong' });
   }
