@@ -48,4 +48,37 @@ router.post('/create', verifyToken, async (req,res) => {
   }
 });
 
+router.post('/get-comments-by-post', verifyToken, async (req, res) => {
+  try{
+    const { postId } = req.body;
+    const { userId } = req.data;
+
+    const comments = await Comment.find({ post: postId });
+
+    return res.status(200).json({
+      comments, userId
+    })
+  } catch (error) {
+    return res.status(500).json({
+      error,
+    });
+  }
+})
+
+router.post('/get-comments-by-user', verifyToken, async (req, res) => {
+  try{
+    const { userId } = req.data;
+
+    const comments = await Comment.find({ owner: userId });
+
+    return res.status(200).json({
+      comments, userId
+    })
+  } catch (error) {
+    return res.status(500).json({
+      error,
+    });
+  }
+})
+
 module.exports = router;
