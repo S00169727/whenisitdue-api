@@ -42,7 +42,9 @@ router.post('/create', verifyToken, async (req, res) => {
 
 router.get('/get-invites', verifyToken, async (req, res) => {
   try {
-    const invites = await Invitation.find({ inviteeId: req.data.userId }).populate('senderId', 'name').populate('teamId', 'name description createdAt');
+    const invites = await Invitation.find({ inviteeId: req.data.userId })
+      .populate('senderId', 'name')
+      .populate('teamId', 'name description createdAt');
 
     return res.status(200).json({ invites });
   } catch (error) {
@@ -77,7 +79,11 @@ router.post('/accept', verifyToken, async (req, res) => {
     const user = await User.findById(userId);
     const team = await Team.findById(teamId);
 
-    if (!user || !team || user.teams.includes(new mongoose.Types.ObjectId(teamId))) {
+    if (
+      !user
+      || !team
+      || user.teams.includes(new mongoose.Types.ObjectId(teamId))
+    ) {
       return res.status(404).json({ message: 'Something went wrong' });
     }
 

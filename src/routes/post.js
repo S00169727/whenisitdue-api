@@ -64,8 +64,12 @@ router.post('/get-posts-by-team', verifyToken, async (req, res) => {
 
     const posts = await Post.find({ team: teamId }).populate('owner', 'name').populate('members');
 
+    const user = await User.findById(userId);
+
+    const isFavourited = user.favourites.filter(el => el._id.equals(teamId)).length > 0;
+
     return res.status(200).json({
-      posts, team, userId, isMember: true,
+      posts, team, userId, isMember: true, isFavourited,
     });
   } catch (error) {
     return res.status(404).json({ message: 'Something went wrong' });
