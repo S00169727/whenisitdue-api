@@ -100,6 +100,39 @@ router.post('/get-comments-by-user', verifyToken, async (req, res) => {
   }
 })
 
+router.post('/edit', verifyToken, async (req, res) => {
+  try {
+    const {
+      commentId,
+      updatedMessage
+    } = req.body;
+
+    const { userId } = req.data;
+
+    const comment = await Comment.findById(commentId).populate('post');
+  
+    const team = await Team.findById({ _id: new mongoose.Types.ObjectId(comment.post.team) });
+
+    if (!team.admins.filter(el => el.equals(new mongoose.Types.ObjectId(userId))).length > 0 
+        && !comment.owner.equals(userId) 
+        || !team.owner.equals(userId)) {
+      return res.status(404).json({ message: 'Something went wrong' });
+    }
+
+    await comment.update( 
+      { $set: {message: updatedMessage} }
+    )
+
+    return res.status(200).json({ message: 'Comment Updated' });
+
+  } catch (error) {
+    return res.status(500).json({
+      error
+    })
+  }
+})
+
+
 router.post('/remove', verifyToken, async (req, res) => {
   try {
     const { commentId } = req.body;
