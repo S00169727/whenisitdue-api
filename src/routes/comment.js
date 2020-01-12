@@ -115,7 +115,7 @@ router.post('/edit', verifyToken, async (req, res) => {
 
     if (!team.admins.filter(el => el.equals(new mongoose.Types.ObjectId(userId))).length > 0 
         && !comment.owner.equals(userId) 
-        || !team.owner.equals(userId)) {
+        && !team.owner.equals(userId)) {
       return res.status(404).json({ message: 'Something went wrong' });
     }
 
@@ -144,7 +144,7 @@ router.post('/remove', verifyToken, async (req, res) => {
 
     if (!team.admins.filter(el => el.equals(new mongoose.Types.ObjectId(userId))).length > 0 
         && !comment.owner.equals(userId) 
-        || !team.owner.equals(userId)) {
+        && !team.owner.equals(userId)) {
       return res.status(404).json({ message: 'Something went wrong' });
     }
 
