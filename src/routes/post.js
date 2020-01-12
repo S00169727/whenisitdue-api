@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 const User = require('../models/User');
 const Team = require('../models/Team');
 const Post = require('../models/Post');
+const Comment = require('../models/Comment');
 const verifyToken = require('../middleware/verifyToken');
 
 const router = express.Router();
@@ -96,6 +97,8 @@ router.post('/remove', verifyToken, async (req, res) => {
     if (!team.admins.filter(el => el.equals(new mongoose.Types.ObjectId(userId))).length > 0 && !post.owner.equals(userId)) {
       return res.status(404).json({ message: 'Something went wrong' });
     }
+    
+    await Comment.deleteMany({post: new mongoose.Types.ObjectId(postId)});
 
     await post.remove();
 
