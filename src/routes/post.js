@@ -101,8 +101,8 @@ router.post('/remove', verifyToken, async (req, res) => {
     if (!team.admins.filter(el => el.equals(new mongoose.Types.ObjectId(userId))).length > 0 && !post.owner.equals(userId)) {
       return res.status(404).json({ message: 'Something went wrong' });
     }
-    
-    await Comment.deleteMany({post: new mongoose.Types.ObjectId(postId)});
+
+    await Comment.deleteMany({ post: new mongoose.Types.ObjectId(postId) });
 
     await post.remove();
 
