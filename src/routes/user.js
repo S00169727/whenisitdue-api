@@ -87,4 +87,16 @@ router.post('/login', async (req, res, next) => {
     });
 });
 
+router.get('/get-basic-details', verifyToken, async (req, res, next) => {
+  try {
+    const { userId } = req.data;
+
+    const user = await User.findById(userId).select('name email createdAt');
+
+    return res.status(200).json({ user });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Something went wrong' });
+  }
+});
 module.exports = router;
